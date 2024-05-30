@@ -78,6 +78,9 @@ void luat_uart_recv_cb(int uart_id, uint32_t data_len)
 
 void gnss_setup_task(void *param)
 {
+    int32_t count_down_time = 0;
+    int32_t count_down_time_max = 86400;
+
     luat_uart_t uart = {
         .id = UART_ID,
         .baud_rate = 115200,
@@ -100,7 +103,30 @@ void gnss_setup_task(void *param)
     //task_ephemeris();
     while (1)
     {
-        luat_rtos_task_sleep(5000);
+        //倒计时，计时器
+        count_down_time = 0;
+        while(count_down_time < count_down_time_max){
+            //根据可能接收到而更新的数据，每秒更新count_down_time_max，使得远程随时设置随时生效、及时跳出计时器循环
+            if(dpValue_frequency <= 0){
+                //GPS待机模式
+                count_down_time_max = 86400;
+            }
+            else{
+                //不是GPS待机模式
+                count_down_time_max = dpValue_frequency;
+            }
+
+            if(dpValue_data_geofencing_length > 0){
+                //不管是不是待机模式，只要设置了电子围栏，就至少需要每60秒定位一次，毕竟要及时检测有么有离开电子围栏呀
+                if(count_down_time_max > 60){
+                    count_down_time_max = 60;
+                }
+            }
+            //计时器累加
+            count_down_time++;
+            luat_rtos_task_sleep(1000);
+        }
+        check_and_upload_once = 1;//按照要求每隔一段时间才上报
     }
     luat_rtos_task_delete(gnss_task_handle);
 }
