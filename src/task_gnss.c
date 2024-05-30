@@ -19,6 +19,8 @@
 // 注意：780EG内部gnss芯片与串口2相连
 #define UART_ID 2
 
+int32_t count_no_gps_seconds = 0;//多长时间没收到gps信号了
+
 typedef struct
 {
     char *gnss_data;
@@ -81,6 +83,8 @@ void gnss_setup_task(void *param)
     int32_t count_down_time = 0;
     int32_t count_down_time_max = 86400;
 
+    
+
     luat_uart_t uart = {
         .id = UART_ID,
         .baud_rate = 115200,
@@ -125,6 +129,12 @@ void gnss_setup_task(void *param)
             //计时器累加
             count_down_time++;
             luat_rtos_task_sleep(1000);
+
+            count_no_gps_seconds++;//超过3秒就是没有卫星信号
+            if(count_no_gps_seconds > 3){
+                dpValue_hasSatellite = false;
+                LUAT_DEBUG_PRINT("dpValue_hasSatellite false\n");
+            }
         }
         check_and_upload_once = 1;//按照要求每隔一段时间才上报
     }
@@ -143,11 +153,10 @@ int parse_nmea(const char *gnssdata)
             
 
             if(frame.speed.scale == 0){
-                LUAT_DEBUG_PRINT("dpValue_hasSatellite false\n");
                 dpValue_hasSatellite = false;
             }
             else{
-                // LUAT_DEBUG_PRINT("dpValue_hasSatellite true\n");
+                count_no_gps_seconds = 0;
                 dpValue_hasSatellite = true;
                 // LUAT_DEBUG_PRINT("$xxRMC: raw coordinates and speed: (%d/%d,%d/%d) %d/%d\n",
                 //              frame.latitude.value, frame.latitude.scale,
