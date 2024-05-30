@@ -282,6 +282,9 @@ void lbsloc_request_task(void *param)
             int16_t sRssi;
             uint8_t retRssi;
             sRssi = cell_info.lte_service_info.rssi;
+
+            dpValue_mobileSignal = sRssi;
+            
             if (sRssi <= -113)
             {
                 retRssi = 0;
