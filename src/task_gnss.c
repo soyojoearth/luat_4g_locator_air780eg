@@ -104,7 +104,7 @@ void gnss_setup_task(void *param)
     cfg.alt_fun = 4;
     luat_gpio_open(&cfg);
     luat_rtos_task_sleep(200);
-    //task_ephemeris();
+
     while (1)
     {
         //倒计时，计时器
@@ -159,17 +159,11 @@ int parse_nmea(const char *gnssdata)
         {
             
 
-            if(frame.speed.scale == 0){
-                // dpValue_hasSatellite = false;
-                // LUAT_DEBUG_PRINT("dpValue_hasSatellite false\n");
-                // LUAT_DEBUG_PRINT("$xxRMC floating point degree coordinates and speed: (%f,%f) %f\n",
-                //                 minmea_tocoord(&frame.latitude),
-                //                 minmea_tocoord(&frame.longitude),
-                //                 minmea_tofloat(&frame.speed));
-            }
-            else{
+            if(frame.speed.scale != 0){
+
                 count_no_gps_seconds = 0;
                 dpValue_hasSatellite = true;
+
                 // LUAT_DEBUG_PRINT("$xxRMC: raw coordinates and speed: (%d/%d,%d/%d) %d/%d\n",
                 //              frame.latitude.value, frame.latitude.scale,
                 //              frame.longitude.value, frame.longitude.scale,
