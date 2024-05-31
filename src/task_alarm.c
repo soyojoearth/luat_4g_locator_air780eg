@@ -189,7 +189,7 @@ void checkAll(){
      * */    
     if(acceleration_current() != 0)
     {
-        LUAT_DEBUG_PRINT("is Move by ACC\n");
+        // LUAT_DEBUG_PRINT("is Move by ACC\n");
         //在动
         if(dpValue_stopTime > 0){
             dpValue_stopTime--;//计算静止时长 单位：秒（正数是静止时长，负数是运动时长）
@@ -203,7 +203,7 @@ void checkAll(){
         if(lat_last != 255 && lon_last != 255 && lat_current != 255 && lon_current != 255 && dpValue_frequency > 0){//有GPS定位模式){
             //距离上一次超过10米，算移动（精度原因）
             if(get_distance(lat_last, lon_last, lat_current, lon_current) > 0.01){
-                LUAT_DEBUG_PRINT("is Move by GPS\n");
+                // LUAT_DEBUG_PRINT("is Move by GPS\n");
                 //在动
                 if(dpValue_stopTime < 0){
                     dpValue_stopTime--;//计算静止时长 单位：秒（正数是静止时长，负数是运动时长）
@@ -213,7 +213,7 @@ void checkAll(){
                 }
             }
             else{
-                LUAT_DEBUG_PRINT("not Move by GPS\n");
+                // LUAT_DEBUG_PRINT("not Move by GPS\n");
                 //静止
                 if(dpValue_stopTime > 0){
                     dpValue_stopTime++;//计算静止时长 单位：秒（正数是静止时长，负数是运动时长）
@@ -224,7 +224,7 @@ void checkAll(){
             }
         }
         else{
-            LUAT_DEBUG_PRINT("not Move on Begin\n");
+            // LUAT_DEBUG_PRINT("not Move on Begin\n");
             //没有加速度，也还没有gps的时候，默认静止
             if(dpValue_stopTime > 0){
                 dpValue_stopTime++;//计算静止时长 单位：秒（正数是静止时长，负数是运动时长）
@@ -243,12 +243,12 @@ void checkAll(){
     if(lat_last != 255 && lon_last != 255 && lat_current != 255 && lon_current != 255 && dpValue_frequency > 0){
         dpValue_speed = get_distance(lat_last, lon_last, lat_current, lon_current) * 1000 / dpValue_frequency;
         dpValue_speed += acceleration_speed_current();
-        LUAT_DEBUG_PRINT("Speed GPS+ACC:%i\n",dpValue_speed);
+        // LUAT_DEBUG_PRINT("Speed GPS+ACC:%i\n",dpValue_speed);
     }
     else{
         //没有gps的时候，只剩下室内的移动速度
         dpValue_speed = acceleration_speed_current();
-        LUAT_DEBUG_PRINT("Speed ACC:%i\n",dpValue_speed);
+        // LUAT_DEBUG_PRINT("Speed ACC:%i\n",dpValue_speed);
     }
     
 

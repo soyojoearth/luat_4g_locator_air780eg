@@ -818,6 +818,8 @@ void uploadMessage(luat_mqtt_ctrl_t *luat_mqtt_ctrl){
 
 	upload_all_once = false;//改回去，下次当true时，才会全部重新上传，一般情况下只上传最少必要数据
 
+	
+
 }
 
 void luat_mqtt_task(void *param)

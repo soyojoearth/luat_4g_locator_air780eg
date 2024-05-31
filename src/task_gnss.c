@@ -130,13 +130,20 @@ void gnss_setup_task(void *param)
             count_down_time++;
             luat_rtos_task_sleep(1000);
 
-            count_no_gps_seconds++;//超过3秒就是没有卫星信号
-            if(count_no_gps_seconds > 3){
+            count_no_gps_seconds++;//超过10秒就是没有卫星信号
+            if(count_no_gps_seconds > 10){
                 dpValue_hasSatellite = false;
-                LUAT_DEBUG_PRINT("dpValue_hasSatellite false\n");
+                // LUAT_DEBUG_PRINT("dpValue_hasSatellite false\n");
             }
         }
-        check_and_upload_once = 1;//按照要求每隔一段时间才上报
+
+        //按照要求每隔一段dpValue_frequency时间才上报
+
+        if(dpValue_hasSatellite){
+            LUAT_DEBUG_PRINT("coordinates gps: (%f,%f)\n", gnss_lat, gnss_lon);
+            check_and_upload_once = 1;
+        }
+        
     }
     luat_rtos_task_delete(gnss_task_handle);
 }
@@ -153,7 +160,12 @@ int parse_nmea(const char *gnssdata)
             
 
             if(frame.speed.scale == 0){
-                dpValue_hasSatellite = false;
+                // dpValue_hasSatellite = false;
+                // LUAT_DEBUG_PRINT("dpValue_hasSatellite false\n");
+                // LUAT_DEBUG_PRINT("$xxRMC floating point degree coordinates and speed: (%f,%f) %f\n",
+                //                 minmea_tocoord(&frame.latitude),
+                //                 minmea_tocoord(&frame.longitude),
+                //                 minmea_tofloat(&frame.speed));
             }
             else{
                 count_no_gps_seconds = 0;
@@ -166,10 +178,10 @@ int parse_nmea(const char *gnssdata)
                 //                 minmea_rescale(&frame.latitude, 1000),
                 //                 minmea_rescale(&frame.longitude, 1000),
                 //                 minmea_rescale(&frame.speed, 1000));
-                LUAT_DEBUG_PRINT("$xxRMC floating point degree coordinates and speed: (%f,%f) %f\n",
-                                minmea_tocoord(&frame.latitude),
-                                minmea_tocoord(&frame.longitude),
-                                minmea_tofloat(&frame.speed));
+                // LUAT_DEBUG_PRINT("$xxRMC floating point degree coordinates and speed: (%f,%f) %f\n",
+                //                 minmea_tocoord(&frame.latitude),
+                //                 minmea_tocoord(&frame.longitude),
+                //                 minmea_tofloat(&frame.speed));
 
                 gnss_lat = minmea_tocoord(&frame.latitude);
                 gnss_lon = minmea_tocoord(&frame.longitude);

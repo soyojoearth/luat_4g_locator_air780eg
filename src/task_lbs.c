@@ -284,7 +284,7 @@ void lbsloc_request_task(void *param)
             sRssi = cell_info.lte_service_info.rssi;
 
             dpValue_mobileSignal = sRssi;
-            
+
             if (sRssi <= -113)
             {
                 retRssi = 0;
@@ -389,6 +389,9 @@ void lbsloc_request_task(void *param)
             second = 0;
 
         }
+
+        
+        
         
         //倒计时，计时器
         count_down_time = 0;
