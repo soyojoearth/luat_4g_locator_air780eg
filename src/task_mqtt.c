@@ -19,11 +19,50 @@
 #include "task_mqtt.h"
 
 
+// 是否使用加密链接, 即MQTTS
+#define MQTT_USE_SSL 			1
+// 是否使用自动重连, 默认是断开后3秒重连
+#define MQTT_USE_AUTORECONNECT 		1
+
+
 #define MQTT_DEMO_AUTOCON 		1
 #define MQTT_DEMO_PUB_QOS 		0
 
+// 以下填写服务器信息
+#if (MQTT_USE_SSL == 1)
+#define MQTT_HOST    	"iot-mqtt-host-tls.newxton.com"   				// MQTTS服务器的地址和端口号
+#define MQTT_PORT		8883
+#else
 #define MQTT_HOST    	"iot-mqtt-host.newxton.com"   				// MQTT服务器的地址和端口号
 #define MQTT_PORT		1883
+#endif
+
+#if (MQTT_USE_SSL == 1)//平台私有CA，期限1千年
+static const char *caCrt = \
+{
+    \
+    "-----BEGIN CERTIFICATE-----\r\n"
+    "MIIDWTCCAkGgAwIBAgIJAMZ52egAH3m9MA0GCSqGSIb3DQEBCwUAMEIxCzAJBgNV\r\n" \
+    "BAYTAlhYMRUwEwYDVQQHDAxEZWZhdWx0IENpdHkxHDAaBgNVBAoME0RlZmF1bHQg\r\n" \
+    "Q29tcGFueSBMdGQwIBcNMjQwNjAzMDgyMjM3WhgPMzAyMzEwMDUwODIyMzdaMEIx\r\n" \
+    "CzAJBgNVBAYTAlhYMRUwEwYDVQQHDAxEZWZhdWx0IENpdHkxHDAaBgNVBAoME0Rl\r\n" \
+    "ZmF1bHQgQ29tcGFueSBMdGQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB\r\n" \
+    "AQC7+Z6FI42Hji0KzCJJyBeJJ/aBBWkOWYa9UDe9o44zCTqew+RLJy+56uM5+X0L\r\n" \
+    "o8OcNMwPZQHBMHHDusq6MqjBB1lIgrkHDBySEr1fuWFfHISnSzuLr+lk2lyUpB9e\r\n" \
+    "4emwHT405W8z2mYTTZH9sbV3wBiD21iuR3L/JAQnuHMO3vpdFKvD9gjkEmF76wtv\r\n" \
+    "n23D6MLSn6SFELxEFOOtR1F77lhwyDd5ygL2NKdruWlAUgGoWqProSliVhNOy4Dm\r\n" \
+    "KCzoRR4HsjInNGlKvLpOQGJJxJS0dI2dusS6zCboMbMomWopJOEURzwaBi1THlBP\r\n" \
+    "xhWrxnS8/fyBXBQlxC32rQr/AgMBAAGjUDBOMB0GA1UdDgQWBBSUWDW8BU9Xn0UA\r\n" \
+    "RmRxx3xFD3Tc5TAfBgNVHSMEGDAWgBSUWDW8BU9Xn0UARmRxx3xFD3Tc5TAMBgNV\r\n" \
+    "HRMEBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQAFf3NtP9b1A/xhGB1hbu4LhXsB\r\n" \
+    "LeeNVldiGmpcQBI/sMYdvFYFeJ7YCmV+8Wh7Wgqhg+LByvUlvv+H3iODZpBW6Z6t\r\n" \
+    "+XQOi4efMsNx+ROCnpHBUBL7fCp392XHRI7HT/Mv8sN1wOmEUghJ3/cn88ZBtlFy\r\n" \
+    "kX/o2YZDEXOeH+ZNp5QeKZ5GkqwmVJeJyqwxQGiUF6nSAUfiHIYU3aC9g5XG+BVN\r\n" \
+    "klAq91+88vzv6VElURNhqOWQEF5VSNDTpZjHgx6xijJ8bUnxGZImKpVRxicXves1\r\n" \
+    "wDvoJH2yLubSnZUwewoapVLtN8cO3IAaq0JCsSKYDZPCuL5sH8ovxqX5ZyOu\r\n" \
+    "-----END CERTIFICATE-----"
+};
+#endif
 
 char *topic_up_prex = "device/up/";
 char *topic_down_prex = "device/down/";
@@ -814,7 +853,7 @@ void uploadMessage(luat_mqtt_ctrl_t *luat_mqtt_ctrl){
 	uint16_t message_id = 0;
 	mqtt_publish_with_qos(&(luat_mqtt_ctrl->broker), mqtt_pub_topic, mqtt_upload_buffer, length_send, 0, MQTT_DEMO_PUB_QOS, &message_id);
 
-	LUAT_DEBUG_PRINT("done");
+	LUAT_DEBUG_PRINT("done %d",MQTT_PORT);
 
 	upload_all_once = false;//改回去，下次当true时，才会全部重新上传，一般情况下只上传最少必要数据
 
@@ -871,8 +910,13 @@ void luat_mqtt_task(void *param)
 	}
 	luat_mqtt_ctrl->ip_addr.type = 0xff;
 	luat_mqtt_connopts_t opts = {0};
-
-	opts.is_tls = 0; 
+#if (MQTT_USE_SSL == 1)
+	opts.is_tls = 1;
+	opts.server_cert = caCrt;
+	opts.server_cert_len = strlen(caCrt);
+#else
+	opts.is_tls = 0;
+#endif 
 	opts.host = MQTT_HOST;
 	opts.port = MQTT_PORT;
 	ret = luat_mqtt_set_connopts(luat_mqtt_ctrl, &opts);
