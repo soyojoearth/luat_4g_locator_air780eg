@@ -28,5 +28,5 @@ https://air780eg.cn
 ![avatar](images/miniprogram.jpg)
 
 
-### 收费项目费用：设备接入平台费
+### 收费项：设备接入平台费
 ### 技术与商务：本项目仅和我微信中朋友合作
