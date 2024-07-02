@@ -289,8 +289,6 @@ void luat_alarm_task(void *param)
 
         dpValue_battery = (battery_val2 - 2800) * 100 / (4100-2800);
 
-        LUAT_DEBUG_PRINT("vbat: 剩余电量 %d%% ",battery_val);
-
 		luat_rtos_task_sleep(1000);
 
 	}
