@@ -914,6 +914,7 @@ void luat_mqtt_task(void *param)
 	opts.is_tls = 1;
 	opts.server_cert = caCrt;
 	opts.server_cert_len = strlen(caCrt);
+	opts.verify = 2;//0不校验/1可选校验/2强制校验 默认2
 #else
 	opts.is_tls = 0;
 #endif 

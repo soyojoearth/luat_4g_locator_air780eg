@@ -7,6 +7,8 @@
 #include "luat_rtos.h"
 #include "luat_mobile.h"
 
+#include "luat_adc.h"
+
 #include "global.h"
 
 #include "task_alarm.h"
@@ -23,6 +25,7 @@ uint8_t checkIsOutGeofencing(){
     //检查电子围栏，是否越界
     // uint8_t dpValue_data_geofencing[252] = {0};//12个字节1个围栏，一共可以存21个围栏
     // int16_t dpValue_data_geofencing_length = 0;
+
 
     int32_t distanceLimit = 0;
     double distanceLimitDouble = 0;
@@ -268,6 +271,11 @@ void checkAll(){
 
 void luat_alarm_task(void *param)
 {
+    
+    int32_t battery_val, battery_val2;
+
+    luat_adc_open(LUAT_ADC_CH_VBAT, NULL);
+
     while(1){
 
 		//检测任务
@@ -275,6 +283,13 @@ void luat_alarm_task(void *param)
 
         //其它。。。
 
+        //电池电压
+        luat_adc_read(LUAT_ADC_CH_VBAT, &battery_val, &battery_val2);
+        // LUAT_DEBUG_PRINT("vbat: adc 原始值 %d, 电压 %d 毫伏",battery_val, battery_val2);
+
+        dpValue_battery = (battery_val2 - 2800) * 100 / (4100-2800);
+
+        LUAT_DEBUG_PRINT("vbat: 剩余电量 %d%% ",battery_val);
 
 		luat_rtos_task_sleep(1000);
 

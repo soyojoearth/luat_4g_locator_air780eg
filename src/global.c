@@ -30,13 +30,13 @@ bool upload_all_once = true;//是否全部数据上传一次，为了节省流�
 
 
 //这里填写模组类型
-char* clientType = "Air780EP";
+char* clientType = "Air780EG";
 
 //填写平台上的ProductId
 char* product_id = "iR3kDi9B8Qd";
 
 //133	设备模组类型	string	可以是方案型号或模组型号
-char* dpValue_model_type = "air780epv";
+char* dpValue_model_type = "air780eg";
 
 //158	启用短信告警	bitmap	按bit位低到高：故障警报|低电量警报|进围栏警报|出围栏警报|震动警报|超速警报|防拆警报|落水警报|温度警报|湿度警报|气压警报|手动警报|移动侦测
 int32_t dpValue_alarmFlagSms = 0;//启用短信告警
