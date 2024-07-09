@@ -42,6 +42,9 @@ static void mobile_event_callback_t(LUAT_MOBILE_EVENT_E event, uint8_t index, ui
             LUAT_DEBUG_PRINT("SIM卡已插入\r\n");
             break;
         case LUAT_MOBILE_NO_SIM:
+            LUAT_DEBUG_PRINT("未插SIM卡0，准备切换到sim卡1\r\n");
+            luat_mobile_set_sim_id (1);
+            break;
         default:
             break;
         }
