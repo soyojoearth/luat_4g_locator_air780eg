@@ -935,7 +935,7 @@ void luat_mqtt_task(void *param)
 
 	// luat_mqtt_ctrl->netc->is_debug = 1;// debug信息
 	luat_mqtt_ctrl->broker.clean_session = 1;
-	luat_mqtt_ctrl->keepalive = 240;
+	luat_mqtt_ctrl->keepalive = 60;
 
 if (MQTT_DEMO_AUTOCON == 1)
 {
